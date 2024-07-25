@@ -7,6 +7,7 @@ namespace Zenject
     public class SignalBus : ILateDisposable
     {
         private readonly DiContainer container;
+        private          bool        isDisposed;
 
         private readonly Dictionary<(Type, Delegate), IDisposable> subscribers = new();
 
@@ -17,13 +18,13 @@ namespace Zenject
 
         public void Fire<TSignal>()
         {
-            if (this.isDisposed) return;
+            // if (this.isDisposed) return;
             this.GetPublisher<TSignal>().Publish(default);
         }
 
         public void Fire<TSignal>(TSignal signal)
         {
-            if (this.isDisposed) return;
+            // if (this.isDisposed) return;
             this.GetPublisher<TSignal>().Publish(signal);
         }
 
@@ -81,7 +82,7 @@ namespace Zenject
 
         private bool TrySubscribeInternal<TSignal>(Delegate callback)
         {
-            if (this.isDisposed) return true;
+            // if (this.isDisposed) return true;
             if (callback is null) throw new ArgumentNullException(nameof(callback));
             var key = (typeof(TSignal), callback);
             if (this.subscribers.ContainsKey(key)) return false;
@@ -97,7 +98,7 @@ namespace Zenject
 
         private bool TryUnsubscribeInternal<TSignal>(Delegate callback)
         {
-            if (this.isDisposed) return true;
+            // if (this.isDisposed) return true;
             if (callback is null) throw new ArgumentNullException(nameof(callback));
             var key = (typeof(TSignal), callback);
             if (!this.subscribers.Remove(key, out var subscriber)) return false;
@@ -105,7 +106,6 @@ namespace Zenject
             return true;
         }
 
-        private bool isDisposed;
 
         void ILateDisposable.LateDispose()
         {
