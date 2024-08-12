@@ -47,6 +47,28 @@ namespace GameFoundation.Scripts.UIModule.ScreenFlow.Managers
             await this.GameAssets.UnloadUnusedAssets(lastScene);
             this.signalBus.Fire<FinishLoadingNewSceneSignal>();
         }
+        
+        public async UniTask LoadMultipleSceneBySceneManagerAsync(string activesScene, params string[] sceneNames)
+        {
+            this.signalBus.Fire<StartLoadingNewSceneSignal>();
+            var lastScene = CurrentSceneName;
+            CurrentSceneName = activesScene;
+            var allTask = new List<UniTask>();
+            
+            for (var index = 0; index < sceneNames.Length; index++)
+            {
+                var sceneName = sceneNames[index];
+                allTask.Add(SceneManager.LoadSceneAsync(sceneName, index == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive).ToUniTask());
+            }
+            
+            allTask.Add(Resources.UnloadUnusedAssets().ToUniTask());
+            this.GameAssets.UnloadUnusedAssets(lastScene);
+            await UniTask.WhenAll(allTask);
+
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(activesScene));
+
+            this.signalBus.Fire<FinishLoadingNewSceneSignal>();
+        }
 
         public async UniTask LoadMultipleSceneAsync(string activesScene, params string[] sceneNames)
         {
