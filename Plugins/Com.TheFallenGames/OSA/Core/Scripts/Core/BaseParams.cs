@@ -210,7 +210,7 @@ namespace Com.TheFallenGames.OSA.Core
 			_ScrollViewRT = iAdapter.AsMonoBehaviour.transform as RectTransform;
 			LayoutRebuilder.ForceRebuildLayoutImmediate(ScrollViewRT);
 
-			AssertValidWidthHeight(ScrollViewRT);
+			// AssertValidWidthHeight(ScrollViewRT);
 
 			var sr = ScrollViewRT.GetComponent<ScrollRect>();
 			if (sr && sr.enabled)
